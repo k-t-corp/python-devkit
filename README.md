@@ -13,7 +13,7 @@ Although it may also build production-ready Python docker containers in the futu
 ## Install
 ```bash
 mkdir -p ~/.python-devkit/tool
-git clone git@github.com:k-t-corp/python-devkit.git ~/.python-devkit/tool
+git clone https://github.com/k-t-corp/python-devkit.git ~/.python-devkit/tool
 python3 -m venv ~/.python-devkit/tool/.venv
 ~/.python-devkit/tool/.venv/bin/pip install poetry
 ~/.python-devkit/tool/.venv/bin/pip poetry install
