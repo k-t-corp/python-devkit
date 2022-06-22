@@ -16,7 +16,7 @@ mkdir -p ~/.python-devkit/tool
 git clone https://github.com/k-t-corp/python-devkit.git ~/.python-devkit/tool
 python3 -m venv ~/.python-devkit/tool/.venv
 ~/.python-devkit/tool/.venv/bin/pip install poetry
-~/.python-devkit/tool/.venv/bin/pip poetry install
+pushd ~/.python-devkit/tool && ~/.python-devkit/tool/.venv/bin/poetry install && popd
 ```
 
 ## Use
