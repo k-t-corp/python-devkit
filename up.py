@@ -9,8 +9,12 @@ from python_devkit.healthchecks import healthcheck_mongodb, healthcheck_redis, h
 from python_devkit.services import write_development_files
 
 if not shutil.which("docker-compose"):
-    raise RuntimeError("docker-compose is not found on PATH, exiting")
-DOCKER_COMPOSE = shutil.which("docker-compose")
+    print("docker-compose is not found on PATH, trying to find docker")
+    if not shutil.which("docker"):
+        raise RuntimeError("docker is not found on PATH, exiting")
+    DOCKER_COMPOSE = [shutil.which("docker"), "compose"]
+else:
+    DOCKER_COMPOSE = [shutil.which("docker-compose")]
 
 if not shutil.which("heroku"):
     raise RuntimeError("heroku is not found on PATH, exiting")
@@ -65,7 +69,7 @@ def main():
     locking_dir = get_locking_dir()
     if locking_dir:
         print(f"Bringing down existing stack on directory {locking_dir}")
-        if not run([DOCKER_COMPOSE, "down"], locking_dir):
+        if not run(DOCKER_COMPOSE + ["down"], locking_dir):
             raise RuntimeError()
     cwd = os.getcwd()
 
@@ -83,7 +87,7 @@ def main():
     # start development stack
     lock_with_cwd()
 
-    if not run([DOCKER_COMPOSE, "up", "-d"], cwd):
+    if not run(DOCKER_COMPOSE + ["up", "-d"], cwd):
         raise RuntimeError()
 
     # wait for stack to be fully healthy
@@ -103,7 +107,7 @@ def main():
         print("Stopping stack")
 
         # stop this stack
-        run([DOCKER_COMPOSE, "down"], cwd)
+        run(DOCKER_COMPOSE + ["down"], cwd)
         unlock_with_cwd()
 
 
