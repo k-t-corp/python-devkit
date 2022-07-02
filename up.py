@@ -1,13 +1,12 @@
 import shutil
 import os
 import json
-import yaml
 import subprocess
 import sys
 import dotenv
 from typing import Optional, List
 from python_devkit.healthchecks import healthcheck_mongodb, healthcheck_redis, healthcheck_minio
-from python_devkit.services import mongodb, redis, minio
+from python_devkit.services import write_development_files
 
 if not shutil.which("docker-compose"):
     raise RuntimeError("docker-compose is not found on PATH, exiting")
@@ -68,9 +67,9 @@ def main():
         print(f"Bringing down existing stack on directory {locking_dir}")
         if not run([DOCKER_COMPOSE, "down"], locking_dir):
             raise RuntimeError()
-
-    # overwrite docker-compose.yml for this stack
     cwd = os.getcwd()
+
+    # parse development services
     python_devkit_dir = os.path.join(cwd, ".python-devkit.json")
     if not os.path.exists(python_devkit_dir):
         print(f".python-devkit.json file {python_devkit_dir} not found")
@@ -78,25 +77,10 @@ def main():
     with open(python_devkit_dir) as f:
         services = json.load(f)["services"]
 
-    docker_compose_services = {}
-    for service in services:
-        if service == "mongodb":
-            docker_compose_services.update(mongodb())
-        if service == "redis":
-            docker_compose_services.update(redis())
-        if service == "minio":
-            docker_compose_services.update(minio())
+    # write development docker-compose.yml
+    write_development_files(cwd, services)
 
-    docker_compose = {
-        "version": "3.9",
-        "services": docker_compose_services
-    }
-
-    docker_compose_dir = os.path.join(cwd, "docker-compose.yml")
-    with open(docker_compose_dir, "w") as f:
-        yaml.dump(docker_compose, f, default_flow_style=False, indent=2, sort_keys=False)
-
-    # start this stack
+    # start development stack
     lock_with_cwd()
 
     if not run([DOCKER_COMPOSE, "up", "-d"], cwd):
