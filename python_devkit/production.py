@@ -83,4 +83,6 @@ def write_production_files(cwd: str, uwsgi_module: str, uwsgi_callable: str):
         f.write(uwsgi_ini)
 
     # write wait.py
-    pass
+    template_wait_py_dir = os.path.join(templates_dir, "wait.py")
+    wait_py_dir = os.path.join(cwd, "wait.py")
+    shutil.copyfile(template_wait_py_dir, wait_py_dir)
