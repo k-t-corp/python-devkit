@@ -1,7 +1,13 @@
 import os
 import yaml
 import shutil
+import stat
 from string import Template
+
+
+def chmod(path: str):
+    st = os.stat(path)
+    os.chmod(path, st.st_mode | stat.S_IEXEC)
 
 
 def write_production_files(cwd: str, uwsgi_module: str, uwsgi_callable: str):
@@ -65,11 +71,13 @@ def write_production_files(cwd: str, uwsgi_module: str, uwsgi_callable: str):
     template_stop_sh_dir = os.path.join(templates_dir, "stop.sh")
     stop_sh_dir = os.path.join(cwd, "stop.sh")
     shutil.copyfile(template_stop_sh_dir, stop_sh_dir)
+    chmod(stop_sh_dir)
 
     # write start.sh
     template_start_sh_dir = os.path.join(templates_dir, "start.sh")
     start_sh_dir = os.path.join(cwd, "start.sh")
     shutil.copyfile(template_start_sh_dir, start_sh_dir)
+    chmod(start_sh_dir)
 
     # write uwsgi.ini
     template_uwsgi_ini_dir = os.path.join(templates_dir, "uwsgi.ini")
