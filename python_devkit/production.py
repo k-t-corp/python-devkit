@@ -61,8 +61,14 @@ def write_production_files(cwd: str):
     shutil.copyfile(template_dockerfile_dir, dockerfile_dir)
 
     # write stop.sh
+    template_stop_sh_dir = os.path.join(templates_dir, "stop.sh")
+    stop_sh_dir = os.path.join(cwd, "stop.sh")
+    shutil.copyfile(template_stop_sh_dir, stop_sh_dir)
 
     # write start.sh
+    template_start_sh_dir = os.path.join(templates_dir, "start.sh")
+    start_sh_dir = os.path.join(cwd, "start.sh")
+    shutil.copyfile(template_start_sh_dir, start_sh_dir)
 
     # write uwsgi.ini
 
