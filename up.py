@@ -74,19 +74,22 @@ def main():
             raise RuntimeError()
     cwd = os.getcwd()
 
-    # parse development services
+    # parse configuration file
     python_devkit_dir = os.path.join(cwd, ".python-devkit.json")
     if not os.path.exists(python_devkit_dir):
         print(f".python-devkit.json file {python_devkit_dir} not found")
         raise RuntimeError()
     with open(python_devkit_dir) as f:
-        services = json.load(f)["services"]
+        config = json.load(f)
+        services = config["services"]
+        uwsgi_module = config["production"]["uwsgi_module"]
+        uwsgi_callable = config["production"]["uwsgi_callable"]
 
     # write development docker-compose.yml
     write_development_files(cwd, services)
 
     # write production files
-    write_production_files(cwd)
+    write_production_files(cwd, uwsgi_module, uwsgi_callable)
 
     # start development stack
     lock_with_cwd()
