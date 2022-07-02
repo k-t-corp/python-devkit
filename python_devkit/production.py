@@ -1,5 +1,6 @@
 import os
 import yaml
+import shutil
 
 
 def write_production_files(cwd: str):
@@ -52,7 +53,12 @@ def write_production_files(cwd: str):
     with open(docker_compose_dir, "w") as f:
         yaml.dump(docker_compose, f, default_flow_style=False, indent=2, sort_keys=False)
 
-    # write Dockerfile
+    # write production.Dockerfile
+    templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+
+    template_dockerfile_dir = os.path.join(templates_dir, "production.Dockerfile")
+    dockerfile_dir = os.path.join(cwd, "Dockerfile")
+    shutil.copyfile(template_dockerfile_dir, dockerfile_dir)
 
     # write stop.sh
 
