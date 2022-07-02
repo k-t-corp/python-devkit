@@ -1,9 +1,10 @@
 # python-devkit
 Opinionated development CLI for my opinionated Python stacks
 
-For now, it's mainly responsible for starting up very similar docker-compose stacks for multiple projects locally
+It does two things
 
-Although it may also build production-ready Python docker containers in the future
+1. Generate `docker-compose` file for local development that starts databases auxiliary to a main Python application
+2. Generate files for production deployment that starts and updates the main Python application on an Ubuntu 20.04 machine that's based on `docker-compose` and `uwsgi`
 
 ## Prerequisites
 * `Python 3.9+`
