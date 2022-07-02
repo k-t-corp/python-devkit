@@ -7,6 +7,7 @@ import dotenv
 from typing import Optional, List
 from python_devkit.healthchecks import healthcheck_mongodb, healthcheck_redis, healthcheck_minio
 from python_devkit.services import write_development_files
+from python_devkit.production import write_production_files
 
 if not shutil.which("docker-compose"):
     print("docker-compose is not found on PATH, trying to find docker")
@@ -83,6 +84,9 @@ def main():
 
     # write development docker-compose.yml
     write_development_files(cwd, services)
+
+    # write production files
+    write_production_files(cwd)
 
     # start development stack
     lock_with_cwd()
