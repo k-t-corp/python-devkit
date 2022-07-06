@@ -5,8 +5,8 @@ import subprocess
 import sys
 import dotenv
 from typing import Optional, List
-from python_devkit.healthchecks import healthcheck_mongodb, healthcheck_redis, healthcheck_minio
-from python_devkit.services import write_development_files
+from python_devkit.dev.healthchecks import service_to_healthchecks
+from python_devkit.dev.write_files import write_development_files
 from python_devkit.production import write_production_files
 
 if not shutil.which("docker-compose"):
@@ -81,15 +81,15 @@ def main():
         raise RuntimeError()
     with open(python_devkit_dir) as f:
         config = json.load(f)
-        services = config["services"]
-        uwsgi_module = config["production"]["uwsgi_module"]
-        uwsgi_callable = config["production"]["uwsgi_callable"]
+        dev_services = config["dev"]["services"]
+        production_uwsgi_module = config["production"]["app"]["web"]["uwsgi_module"]
+        production_uwsgi_callable = config["production"]["app"]["web"]["uwsgi_callable"]
 
     # write development docker-compose.yml
-    write_development_files(cwd, services)
+    write_development_files(cwd, dev_services)
 
     # write production files
-    write_production_files(cwd, uwsgi_module, uwsgi_callable)
+    write_production_files(cwd, production_uwsgi_module, production_uwsgi_callable)
 
     # start development stack
     lock_with_cwd()
@@ -98,13 +98,11 @@ def main():
         raise RuntimeError()
 
     # wait for stack to be fully healthy
-    for service in services:
-        if service == "mongodb":
-            healthcheck_mongodb()
-        if service == "redis":
-            healthcheck_redis()
-        if service == "minio":
-            healthcheck_minio()
+    for dev_service in dev_services:
+        if dev_service in service_to_healthchecks:
+            service_to_healthchecks[dev_service]()
+        else:
+            print(f"Cannot find healthcheck for service {dev_service}")
 
     try:
         # export env and run Procfile
