@@ -82,14 +82,15 @@ def main():
     with open(python_devkit_dir) as f:
         config = json.load(f)
         services = config["services"]
-        uwsgi_module = config["production"]["uwsgi_module"]
-        uwsgi_callable = config["production"]["uwsgi_callable"]
+        uwsgi_module = config.get("production", {}).get("uwsgi_module")
+        uwsgi_callable = config.get("production", {}).get("uwsgi_callable")
 
     # write development docker-compose.yml
     write_development_files(cwd, services)
 
     # write production files
-    write_production_files(cwd, uwsgi_module, uwsgi_callable)
+    if uwsgi_module and uwsgi_callable:
+        write_production_files(cwd, uwsgi_module, uwsgi_callable)
 
     # start development stack
     lock_with_cwd()
